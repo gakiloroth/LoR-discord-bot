@@ -1,4 +1,4 @@
 # LoR-discord-bot
 
-##WIP
+## WIP
 Learning how to make a discord bot :)
