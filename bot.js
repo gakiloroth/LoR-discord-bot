@@ -91,7 +91,9 @@ client.on('message', message => {
         "`" + config.prefix + "cardid`\n" +
         "`" + config.prefix + "deck`\n" +
         "`" + config.prefix + "currentgame`\n" +
-        "`" + config.prefix + "lastgame`\n"
+        "`" + config.prefix + "lastgame`\n" +
+        "`" + config.prefix + "artname`\n" +
+        "`" + config.prefix + "artid`\n"
       )
       .setFooter("Commands are case insensitive. For requests/issues or more help go to my github: https://www.github.com/gakiloroth/LoR-discord-bot")
 
@@ -377,6 +379,96 @@ client.on('message', message => {
             "**Related Cards: ** " + associatedCardsString + "\n"
             ,false);
           }
+
+          message.channel.send({embed});
+      }
+
+      // get card art by name
+      if(command === "artname"){
+        const myCardName = message.content.slice(config.prefix.length + command.length)
+        .trim()
+        .toLowerCase()
+        .replace(/\s/g, '');
+
+        console.log(myCardName);
+
+        var currCard = null;
+
+        for(let i = 0; i < set.length; i++) {
+          if(set[i].name.toLowerCase().replace(/\s/g, '') === myCardName){
+            currCard = set[i];
+          }
+        }
+
+        if(currCard === null){
+          message.channel.send("No matching card found!");
+          return;
+        }
+
+        const artAttach = new Discord.Attachment(cardArt + currCard.cardCode + '-full.png', 'art.png');
+        var regionAttach;
+
+        // TEMPORARY FIX FOR NEUTRAL and ALL
+        if(currCard.regionRef.toLowerCase() === 'neutral'){
+          regionAttach = new Discord.Attachment(regionIcons + 'icon-all' + '.png', 'icon.png');
+        }
+        else{
+          regionAttach = new Discord.Attachment(regionIcons + 'icon-' +
+            currCard.regionRef.toLowerCase() + '.png', 'icon.png');
+        }
+
+        const embed = new Discord.RichEmbed()
+          .setAuthor(client.user.username, client.user.avatarURL)
+          .setColor(0x1c60ff)
+          .attachFiles([artAttach, regionAttach])
+          .setImage('attachment://art.png')
+          .setThumbnail('attachment://icon.png')
+          .setFooter(currCard.flavorText + '      Artist: ' + currCard.artistName)
+
+          message.channel.send({embed});
+      }
+
+      // get card art by id
+      if(command === "artid"){
+        const myCardID = message.content.slice(config.prefix.length + command.length)
+        .trim()
+        .toLowerCase()
+        .replace(/\s/g, '');
+
+        console.log(myCardID);
+
+        var currCard = null;
+
+        for(let i = 0; i < set.length; i++) {
+          if(set[i].cardCode.toLowerCase().replace(/\s/g, '') === myCardID){
+            currCard = set[i];
+          }
+        }
+
+        if(currCard === null){
+          message.channel.send("No matching card found!");
+          return;
+        }
+
+        const artAttach = new Discord.Attachment(cardArt + currCard.cardCode + '-full.png', 'art.png');
+        var regionAttach;
+
+        // TEMPORARY FIX FOR NEUTRAL and ALL
+        if(currCard.regionRef.toLowerCase() === 'neutral'){
+          regionAttach = new Discord.Attachment(regionIcons + 'icon-all' + '.png', 'icon.png');
+        }
+        else{
+          regionAttach = new Discord.Attachment(regionIcons + 'icon-' +
+            currCard.regionRef.toLowerCase() + '.png', 'icon.png');
+        }
+
+        const embed = new Discord.RichEmbed()
+          .setAuthor(client.user.username, client.user.avatarURL)
+          .setColor(0x1c60ff)
+          .attachFiles([artAttach, regionAttach])
+          .setImage('attachment://art.png')
+          .setThumbnail('attachment://icon.png')
+          .setFooter(currCard.flavorText + '      Artist: ' + currCard.artistName)
 
           message.channel.send({embed});
       }
