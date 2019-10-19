@@ -69,6 +69,11 @@ client.on('message', message => {
       message.channel.send("Hecc DBM!");
   }
 
+  // author Reinforcements
+  if (command === 'author') {
+    message.channel.send("https://www.github.com/gakiloroth");
+  }
+
   // get card info
   if(command === "keyword"){
     let[myKeyword] = args;
@@ -326,7 +331,72 @@ client.on('message', message => {
             }
 
             message.channel.send({embed});
-          }
+        }
+
+        if(command === "deck"){
+          request.get({
+            url: 'http://localhost:21337/static-decklist',
+            json: true
+          },
+            (err, res, body) => {
+              if (!err && res.statusCode === 200) {
+                  console.log(body); // Print the json response
+                  if(body.DeckCode !== null){
+                    message.channel.send(body.DeckCode);
+                  }
+                  else{
+                    message.channel.send("Player not in game!");
+                  }
+              }
+          });
+        }
+
+        if(command === "lastgame"){
+          request.get({
+            url: 'http://localhost:21337/game-result',
+            json: true
+          },
+            (err, res, body) => {
+              if (!err && res.statusCode === 200) {
+                  console.log(body); // Print the json response
+                  if(body.LocalPlayerWon !== null){
+                    if(body.LocalPlayerWon){
+                      message.channel.send("Player won the last game!");
+                    }
+                    else{
+                      message.channel.send("Player lost the last game.");
+                    }
+                  }
+                  else{
+                    message.channel.send("No last game info!");
+                  }
+              }
+          });
+        }
+
+        if(command === "currentgame"){
+          request.get({
+            url: 'http://localhost:21337/positional-rectangles',
+            json: true
+          },
+            (err, res, body) => {
+              if (!err && res.statusCode === 200) {
+                  console.log(body); // Print the json response
+                  if(body.PlayerName !== null){
+                    message.channel.send(body.PlayerName + " is in game against " +
+                    body.OpponentName + ".");
+                  }
+                  else{
+                    message.channel.send("Player not in game!");
+                  }
+              }
+          });
+        }
+});
+
+process.on('unhandledRejection', error => {
+  // Won't execute
+  console.log('unhandledRejection');
 });
 
 client.login(config.token);
