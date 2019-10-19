@@ -1,7 +1,12 @@
 # LoR-discord-bot
 
 ## WIP
-Learning how to make a discord bot :)
+Learning how to make a discord bot :) This is a Legends of Runeterra Discord bot.
+
+### Current Functionality:
+- Getting card info
+- Getting keyword info
+- Basic API info (local player current match, last match, deck)
 
 ### This bot requires a config.json with these values:
 - token: bot's auth token
