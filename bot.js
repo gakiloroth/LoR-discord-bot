@@ -180,7 +180,7 @@ client.on('message', message => {
           .attachFiles([artAttach, regionAttach])
           .setImage('attachment://art.png')
           .setThumbnail('attachment://icon.png')
-          .setFooter(currCard.flavorText + '      Artist: ' + currCard.artistName)
+          .setFooter(currCard.flavorText + '    |  Artist: ' + currCard.artistName)
 
           //get related cards
           var associatedCards = currCard.associatedCardRefs;
@@ -224,6 +224,29 @@ client.on('message', message => {
             "**Cost: ** " + currCard.cost + "\n" +
             "**Attack: ** " + currCard.attack + "\n" +
             "**Health: ** " + currCard.health + "\n" +
+            "**Keywords: ** " + currCard.keywords + "\n" +
+            "**Type: ** " + currCard.supertype + " "+ currCard.type + "\n" +
+            "**Rarity: ** " + currCard.rarity + "\n" +
+            "**Region: ** " + currCard.region + "\n" +
+            "**ID: ** " + currCard.cardCode + "\n" +
+            "**Related Cards: ** " + associatedCardsString + "\n"
+            ,false);
+          }
+
+          if(currCard.type === 'Trap'){
+            embed.addField("**Details** ",
+            "**Keywords: ** " + currCard.keywords + "\n" +
+            "**Type: ** " + currCard.supertype + " "+ currCard.type + "\n" +
+            "**Rarity: ** " + currCard.rarity + "\n" +
+            "**Region: ** " + currCard.region + "\n" +
+            "**ID: ** " + currCard.cardCode + "\n" +
+            "**Related Cards: ** " + associatedCardsString + "\n"
+            ,false);
+          }
+
+          if(currCard.type === 'Ability'){
+            embed.addField("**Details** ",
+            "**Cost: ** " + currCard.cost + "\n" +
             "**Keywords: ** " + currCard.keywords + "\n" +
             "**Type: ** " + currCard.supertype + " "+ currCard.type + "\n" +
             "**Rarity: ** " + currCard.rarity + "\n" +
