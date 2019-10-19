@@ -177,6 +177,23 @@ client.on('message', message => {
           .setThumbnail('attachment://icon.png')
           .setFooter(currCard.flavorText + '      Artist: ' + currCard.artistName)
 
+          //get related cards
+          var associatedCards = currCard.associatedCardRefs;
+          var associatedCardsString = "";
+          for(let i = 0; i < associatedCards.length; i++){
+            function findCard(card){
+              return card.cardCode === associatedCards[i];
+            }
+
+            var foundCard = set.find(findCard);
+
+            if(i == associatedCards.length - 1){
+              associatedCardsString += foundCard.name + " (" + foundCard.cardCode + ")";
+              break;
+            }
+            associatedCardsString += foundCard.name + " (" + foundCard.cardCode + "), ";
+          }
+
           // detail in title if card is collectible
           if(currCard.collectible === true){
             embed.setTitle(currCard.name + ' (Collectible)');
@@ -191,7 +208,9 @@ client.on('message', message => {
             "**Cost: ** " + currCard.cost + "\n" +
             "**Type: ** " + currCard.spellSpeed + " Spell\n" +
             "**Rarity: ** " + currCard.rarity + "\n" +
-            "**Region: ** " + currCard.region + "\n"
+            "**Region: ** " + currCard.region + "\n" +
+            "**ID: ** " + currCard.cardCode + "\n" +
+            "**Related Cards: ** " + associatedCardsString + "\n"
             ,false);
           }
 
@@ -203,12 +222,111 @@ client.on('message', message => {
             "**Keywords: ** " + currCard.keywords + "\n" +
             "**Type: ** " + currCard.supertype + " "+ currCard.type + "\n" +
             "**Rarity: ** " + currCard.rarity + "\n" +
-            "**Region: ** " + currCard.region + "\n"
+            "**Region: ** " + currCard.region + "\n" +
+            "**ID: ** " + currCard.cardCode + "\n" +
+            "**Related Cards: ** " + associatedCardsString + "\n"
             ,false);
           }
 
           message.channel.send({embed});
         }
+
+        // get card by id
+        if(command === "cardid"){
+          const myCardID = message.content.slice(config.prefix.length + command.length)
+          .trim()
+          .toLowerCase()
+          .replace(/\s/g, '');
+
+          console.log(myCardID);
+
+          var currCard = null;
+
+          for(let i = 0; i < set.length; i++) {
+            if(set[i].cardCode.toLowerCase().replace(/\s/g, '') === myCardID){
+              currCard = set[i];
+            }
+          }
+
+          if(currCard === null){
+            message.channel.send("No matching card found!");
+            return;
+          }
+
+          const artAttach = new Discord.Attachment(cardArt + currCard.cardCode + '.png', 'art.png');
+          var regionAttach;
+
+          // TEMPORARY FIX FOR NEUTRAL and ALL
+          if(currCard.regionRef.toLowerCase() === 'neutral'){
+            regionAttach = new Discord.Attachment(regionIcons + 'icon-all' + '.png', 'icon.png');
+          }
+          else{
+            regionAttach = new Discord.Attachment(regionIcons + 'icon-' +
+              currCard.regionRef.toLowerCase() + '.png', 'icon.png');
+          }
+
+          const embed = new Discord.RichEmbed()
+            .setDescription('**Description:** ' + currCard.descriptionRaw)
+            .setAuthor(client.user.username, client.user.avatarURL)
+            .setColor(0x1c60ff)
+            .attachFiles([artAttach, regionAttach])
+            .setImage('attachment://art.png')
+            .setThumbnail('attachment://icon.png')
+            .setFooter(currCard.flavorText + '      Artist: ' + currCard.artistName)
+
+            //get related cards
+            var associatedCards = currCard.associatedCardRefs;
+            var associatedCardsString = "";
+            for(let i = 0; i < associatedCards.length; i++){
+              function findCard(card){
+                return card.cardCode === associatedCards[i];
+              }
+
+              var foundCard = set.find(findCard);
+
+              if(i == associatedCards.length - 1){
+                associatedCardsString += foundCard.name + " (" + foundCard.cardCode + ")";
+                break;
+              }
+              associatedCardsString += foundCard.name + " (" + foundCard.cardCode + "), ";
+            }
+
+            // detail in title if card is collectible
+            if(currCard.collectible === true){
+              embed.setTitle(currCard.name + ' (Collectible)');
+            }
+            else{
+              embed.setTitle(currCard.name);
+            }
+
+            // access different data depenidng on card type
+            if(currCard.type === 'Spell'){
+              embed.addField("**Details** ",
+              "**Cost: ** " + currCard.cost + "\n" +
+              "**Type: ** " + currCard.spellSpeed + " Spell\n" +
+              "**Rarity: ** " + currCard.rarity + "\n" +
+              "**Region: ** " + currCard.region + "\n" +
+              "**ID: ** " + currCard.cardCode + "\n" +
+              "**Related Cards: ** " + associatedCardsString + "\n"
+              ,false);
+            }
+
+            if(currCard.type === 'Unit'){
+              embed.addField("**Details** ",
+              "**Cost: ** " + currCard.cost + "\n" +
+              "**Attack: ** " + currCard.attack + "\n" +
+              "**Health: ** " + currCard.health + "\n" +
+              "**Keywords: ** " + currCard.keywords + "\n" +
+              "**Type: ** " + currCard.supertype + " "+ currCard.type + "\n" +
+              "**Rarity: ** " + currCard.rarity + "\n" +
+              "**Region: ** " + currCard.region + "\n" +
+              "**ID: ** " + currCard.cardCode + "\n" +
+              "**Related Cards: ** " + associatedCardsString + "\n"
+              ,false);
+            }
+
+            message.channel.send({embed});
+          }
 });
 
 client.login(config.token);
