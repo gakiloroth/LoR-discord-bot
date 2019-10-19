@@ -1,6 +1,9 @@
 const Discord = require('discord.js');
 const client = new Discord.Client();
 const config = require('./config.json');
+const LoRAPI = require('./api-wrapper.js');
+const lorapi = new LoRAPI(config.riotAPIKey);
+
 var redownloadJSON = false;
 
 // command line arguments
@@ -165,6 +168,7 @@ client.on('message', message => {
       const myCardName = message.content.slice(config.prefix.length + command.length)
       .trim()
       .toLowerCase()
+      .replace("[^a-zA-Z0-9]", "") // remove special characters
       .replace(/\s/g, '');
 
       console.log(myCardName);
@@ -172,7 +176,7 @@ client.on('message', message => {
       var currCard = null;
 
       for(let i = 0; i < set.length; i++) {
-        if(set[i].name.toLowerCase().replace(/\s/g, '') === myCardName){
+        if(set[i].name.toLowerCase().replace("[^a-zA-Z0-9]", "").replace(/\s/g, '') === myCardName){
           currCard = set[i];
         }
       }
@@ -378,69 +382,51 @@ client.on('message', message => {
       }
 
       if(command === "deck"){
-        request.get({
-          url: 'http://localhost:21337/static-decklist',
-          json: true
-        },
-          (err, res, body) => {
-            if (!err && res.statusCode === 200) {
-                console.log(body); // Print the json response
-                if(body.DeckCode !== null){
-                  message.channel.send(body.DeckCode);
-                }
-                else{
-                  message.channel.send("Player not in game!");
-                }
-            }
-        });
+        lorapi.deck("localhost:21337", function(data) {
+          console.log(data);
+          if(data.DeckCode !== null){
+            message.channel.send(data.DeckCode);
+          }
+          else{
+            message.channel.send("Player not in game!");
+          }
+        })
       }
 
       if(command === "lastgame"){
-        request.get({
-          url: 'http://localhost:21337/game-result',
-          json: true
-        },
-          (err, res, body) => {
-            if (!err && res.statusCode === 200) {
-                console.log(body); // Print the json response
-                if(body.LocalPlayerWon !== null){
-                  if(body.LocalPlayerWon){
-                    message.channel.send("Player won the last game!");
-                  }
-                  else{
-                    message.channel.send("Player lost the last game.");
-                  }
-                }
-                else{
-                  message.channel.send("No last game info!");
-                }
+        lorapi.lastgame("localhost:21337", function(data) {
+          console.log(data);
+          if(data.LocalPlayerWon !== null){
+            if(data.LocalPlayerWon){
+              message.channel.send("Player won the last game!");
             }
-        });
+            else{
+              message.channel.send("Player lost the last game.");
+            }
+          }
+          else{
+            message.channel.send("No last game info!");
+          }
+        })
       }
 
       if(command === "currentgame"){
-        request.get({
-          url: 'http://localhost:21337/positional-rectangles',
-          json: true
-        },
-          (err, res, body) => {
-            if (!err && res.statusCode === 200) {
-                console.log(body); // Print the json response
-                if(body.PlayerName !== null){
-                  message.channel.send(body.PlayerName + " is in game against " +
-                  body.OpponentName + ".");
-                }
-                else{
-                  message.channel.send("Player not in game!");
-                }
-            }
-        });
+        lorapi.currentgame("localhost:21337", function(data) {
+          console.log(data);
+          if(data.PlayerName !== null){
+            message.channel.send(data.PlayerName + " is in game against " +
+            data.OpponentName + ".");
+          }
+          else{
+            message.channel.send("Player not in game!");
+          }
+        })
       }
 });
 
 process.on('unhandledRejection', error => {
   // Won't execute
-  console.log('unhandledRejection');
+  console.log('unhandledRejection', error);
 });
 
 client.login(config.token);
