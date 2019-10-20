@@ -3,8 +3,12 @@ const client = new Discord.Client();
 const config = require('./config.json');
 const LoRAPI = require('./api-wrapper.js');
 const lorapi = new LoRAPI(config.riotAPIKey);
+var rimraf = require("rimraf");
+const datapath = './data';
 
 var redownloadJSON = false;
+var downloadingCore = false;
+var downloadingSet = false;
 
 // command line arguments
 if(process.argv[2] === 'true'){
@@ -19,28 +23,51 @@ var request = require('request');
 
 // if you pass in command line argument to redownload json files
 if(redownloadJSON){
-  request.get({url: core_package_url, encoding: null}, (err, res, body) => {
-    var zip = new AdmZip(body);
+  // set download variables
+  downloadingCore = true;
+  downloadingSet = true;
 
+  // request new data
+  request.get({url: core_package_url, encoding: null}, (err, res, body) => {
+    // if request is successful, delete old data
+    try {
+      rimraf.sync(datapath + '/core-en-us/');
+      //directory removed
+    }
+    catch(err) {
+      console.error(err);
+    }
+
+    var zip = new AdmZip(body);
     zip.extractAllTo("data/core-en-us");
     console.log('retrieved core package');
-
+    downloadingCore = false;
   });
 
   request.get({url: set_bundle_full_url, encoding: null}, (err, res, body) => {
-    var zip = new AdmZip(body);
+    // if request is successful, delete old data
+    try {
+      rimraf.sync(datapath + '/set-full');
+      //directory removed
+    }
+    catch(err) {
+      console.error(err);
+    }
 
+    var zip = new AdmZip(body);
     zip.extractAllTo("data/set-full");
     console.log('retrieved set full package');
-
+    downloadingSet = false;
   });
 }
 
-// load jsons after download
-const globals = require(config.globals);
-const set = require(config.set);
-const regionIcons = config.regionIcons;
-const cardArt = config.cardArt;
+if(!downloadingSet || !downloadingCore){
+  // load jsons after download
+  const globals = require(config.globals);
+  const set = require(config.set);
+  const regionIcons = config.regionIcons;
+  const cardArt = config.cardArt;
+}
 
 client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
@@ -56,7 +83,7 @@ client.on('ready', () => {
 
 client.on('message', message => {
   // Exit and stop if it's not there and prevent bots from triggering each other
-  if (!message.content.startsWith(config.prefix) || message.author.bot) {
+  if (!message.content.startsWith(config.prefix) || message.author.bot || downloadingSet || downloadingCore) {
     return;
   }
 
