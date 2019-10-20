@@ -6,6 +6,12 @@ const lorapi = new LoRAPI(config.riotAPIKey);
 var rimraf = require("rimraf");
 const datapath = './data';
 
+
+var globals = "";
+var set = "";
+var regionIcons = "";
+var cardArt = "";
+
 var redownloadJSON = false;
 var downloadingCore = false;
 var downloadingSet = false;
@@ -59,15 +65,21 @@ if(redownloadJSON){
     zip.extractAllTo("data/set-full");
     console.log('retrieved set full package');
     downloadingSet = false;
+
+    // load jsons after last download
+    globals = require(config.globals);
+    set = require(config.set);
+    regionIcons = config.regionIcons;
+    cardArt = config.cardArt;
   });
 }
 
 if(!downloadingSet || !downloadingCore){
-  // load jsons after download
-  const globals = require(config.globals);
-  const set = require(config.set);
-  const regionIcons = config.regionIcons;
-  const cardArt = config.cardArt;
+  // load jsons from memory
+  globals = require(config.globals);
+  set = require(config.set);
+  regionIcons = config.regionIcons;
+  cardArt = config.cardArt;
 }
 
 client.on('ready', () => {
