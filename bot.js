@@ -104,6 +104,10 @@ client.on('message', message => {
   const args = message.content.slice(config.prefix.length).trim().split(/ +/g);
   const command = args.shift().toLowerCase();
 
+  // log who called the message
+  console.log(message.author.username + "#" + message.author.discriminator + " called command: " +
+    command + " | with args: " + args);
+
   // Restrict a command to a specific user by ID
   if (command === 'dbm') {
   //if (message.content.startsWith(config.prefix + 'dbm')) {
