@@ -27,7 +27,9 @@ class LoRAPI {
       if (!error && response.statusCode === 200) {
         callback(JSON.parse(body));
       }
+      else {
       callback(null);
+      }
     })
   }
 }
