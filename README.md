@@ -4,6 +4,9 @@
 Learning how to make a discord bot :) This is a Legends of Runeterra Discord bot.
 There is currently a typo with how Riot named their region image, its spelled "zuan" when its supposed to be "zaun".
 
+## How to use
+To be honest, I'm not 100% sure how to set this bot up from scratch, I personally followed [An Idiot's Guide](https://anidiots.guide/) to setup the Bot's account on Discord and code it. Walking through the initial setup, and then downloading this bot *should* work.
+
 ### Current Functionality:
 - Getting card info
 - Getting keyword info
