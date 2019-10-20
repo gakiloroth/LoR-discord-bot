@@ -96,6 +96,7 @@ client.on('ready', () => {
 
 client.on('message', message => {
   // Exit and stop if it's not there and prevent bots from triggering each other
+  // Prevent command while bot downloads data packages
   if (!message.content.startsWith(config.prefix) || message.author.bot || downloadingSet || downloadingCore) {
     return;
   }
@@ -515,6 +516,10 @@ client.on('message', message => {
 
       if(command === "deck"){
         lorapi.deck("localhost:21337", function(data) {
+          if(data === null){
+            message.channel.send("API unresponsive!");
+            return;
+          }
           console.log(data);
           if(data.DeckCode !== null){
             message.channel.send(data.DeckCode);
@@ -527,6 +532,10 @@ client.on('message', message => {
 
       if(command === "lastgame"){
         lorapi.lastgame("localhost:21337", function(data) {
+          if(data == null){
+            message.channel.send("API unresponsive!");
+            return;
+          }
           console.log(data);
           if(data.LocalPlayerWon !== null){
             if(data.LocalPlayerWon){
@@ -544,6 +553,10 @@ client.on('message', message => {
 
       if(command === "currentgame"){
         lorapi.currentgame("localhost:21337", function(data) {
+          if(data == null){
+            message.channel.send("API unresponsive!");
+            return;
+          }
           console.log(data);
           if(data.PlayerName !== null){
             message.channel.send(data.PlayerName + " is in game against " +

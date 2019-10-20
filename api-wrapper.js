@@ -24,9 +24,10 @@ class LoRAPI {
     const url = `${baseUrl}${player}/${type}/`;
     console.log(url);
     request(url, function(error, response, body) {
-      if (!error & response.statusCode === 200) {
+      if (!error && response.statusCode === 200) {
         callback(JSON.parse(body));
       }
+      callback(null);
     })
   }
 }
