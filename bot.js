@@ -122,6 +122,19 @@ client.on('message', message => {
     message.channel.send("https://www.github.com/gakiloroth");
   }
 
+  // get avatar
+  if (command === 'avatar'){
+    const member = message.mentions.users.first() || message.author;
+    const embed = new Discord.RichEmbed()
+      .setTitle(member.username)
+      .setURL(member.avatarURL)
+      .setImage(member.avatarURL)
+      .setColor(0x1c60ff)
+      .setFooter("If the image doesn't load click the title")
+
+      message.channel.send({embed});
+  }
+
   // help
   if (command === 'helplor'){
     const embed = new Discord.RichEmbed()
@@ -147,11 +160,7 @@ client.on('message', message => {
 
   // get card info
   if(command === "keyword"){
-    const myKeyword = message.content.slice(config.prefix.length + command.length)
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-zA-Z0-9]/g, "") // remove special characters
-    .replace(/\s/g, '');
+    const myKeyword = removeSpecialChars(message.content.slice(config.prefix.length + command.length));
 
     var currKeywords = globals.keywords;
     var currWord = null;
@@ -216,11 +225,7 @@ client.on('message', message => {
 
     // get card by name
     if(command === "cardname"){
-      const myCardName = message.content.slice(config.prefix.length + command.length)
-      .trim()
-      .toLowerCase()
-      .replace(/[^a-zA-Z0-9]/g, "") // remove special characters
-      .replace(/\s/g, '');
+      const myCardName = removeSpecialChars(message.content.slice(config.prefix.length + command.length));
 
       console.log(myCardName);
 
@@ -434,11 +439,7 @@ client.on('message', message => {
 
       // get card art by name
       if(command === "artname"){
-        const myCardName = message.content.slice(config.prefix.length + command.length)
-        .trim()
-        .toLowerCase()
-        .replace(/[^a-zA-Z0-9]/g, "") // remove special characters
-        .replace(/\s/g, '');
+        const myCardName = removeSpecialChars(message.content.slice(config.prefix.length + command.length));
 
         console.log(myCardName);
 
@@ -577,6 +578,13 @@ client.on('message', message => {
         })
       }
 });
+
+function removeSpecialChars(input){
+  return input.trim()
+        .toLowerCase()
+        .replace(/[^a-zA-Z0-9]/g, "")
+        .replace(/\s/g, '');
+}
 
 process.on('unhandledRejection', error => {
   // Won't execute
